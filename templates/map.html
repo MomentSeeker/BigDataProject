@@ -1,0 +1,156 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>土地信息查询</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="author" content="Cecilia Lee">
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=IHBz7WW8iAVI4eIqDzVTyrV7"></script>
+<script src="../static/esl.js"></script>
+<script src="../static/jquery.min.js"></script>
+<script src="./static/jquery-1.9.1.js" type="text/javascript"></script>
+
+<!--
+.STYLE2 {font-size: 16px}
+-->
+    </style>
+</head>
+<body style="background:#CBE1FF">
+<div style="position: absolute;width:730px;margin:auto;">   
+        <div align="left">
+          <p>要查询的地址：
+            <input id="text1" type="text" value="南京站" style="margin-right:70px;"/>
+        查询结果(经纬度)：
+        <input id="result1" type="text" style="width:60px;"/>      
+        <input id="result2" type="text" style="width:60px"/>
+		<input type="button" value="查询" onClick="searchByStationName();"/>
+		<a href=# id="touch">计算</a>
+		 <span id=result>?</span>
+                <br/>
+        要查询的地址：
+        <input id="text2" type="text" value="南京理工大学" style="margin-right:70px;"/>
+        查询结果(经纬度)：
+        <input id="result3" type="text" />
+        <input type="button" value="查询" onClick="searchByStationName2();"/>
+        <input type="button" value="计算距离" id="button"/>
+            <input type="text" id="districtName" onFocus="this.select()"/>
+            <input type="button" onClick="getBoundary()" value="获取轮廓线"/>
+          </p>
+        </div>
+</div> 
+    <div id="container" 
+            style="position: absolute;
+                margin-top:52px; 
+                width: 730px; 
+                height: 580px; 
+                top: 50; 
+                border: 1px solid gray;">
+     <IFRAME width=120% height=550 marginwidth=0 marginheight=0 SRC="/bar" >
+</IFRAME> 
+    </div>  
+    <div align="left"></div>
+<div style="position: absolute; width:700px; margin:auto; left: 750px; top: 15px; height: 646px;">
+      <p>&nbsp;</p>
+  <p class="STYLE2">相关分析结果 </p>
+      <label>
+	  <IFRAME NAME="content_frame" width=120% height=550 marginwidth=0 marginheight=0 SRC="/bar" >
+</IFRAME> 
+      </label>
+      <IFRAME NAME="content_frame" width=120% height=400 marginwidth=0 marginheight=0 SRC="/line" >
+</IFRAME> </p>
+ </div>
+</body>
+<script src="../static/map.js"></script> 
+<script type="text/javascript">
+var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+</script>
+<script type="text/javascript">
+//发送经纬度信息给后台，并接收后台数据到前端  
+  $(function() {
+    $('a#touch').bind('click', function() {
+      $.getJSON($SCRIPT_ROOT + '/_add_data', {
+        a: $('#result1').val(),
+        b: $('#result2').val()
+      }, function(data) {
+        $('#result').text(data.length);
+		var point = new Array(); //存放标注点经纬信息的数组  
+        var marker = new Array(); //存放标注点对象的数组  
+        var info = new Array(); //存放提示信息窗口对象的数组  
+        for (var i = 0; i < data.length; i++) {  
+            point[i] = new window.BMap.Point(data[i].x,data[i].y); //循环生成新的地图点  
+            marker[i] = new window.BMap.Marker(point[i]); //按照地图点坐标生成标记  
+            map.addOverlay(marker[i]);  
+            marker[i].setAnimation(BMAP_ANIMATION_BOUNCE); //跳动的动画  
+            var label = new window.BMap.Label(data[i].id, { offset: new window.BMap.Size(20, -10) });  
+            marker[i].setLabel(label);  
+            info[i] = new window.BMap.InfoWindow("<p style=’font-size:12px;lineheight:1.8em;’>" + data[i].id + "</br>经度：" + data[i].x + "</br> 纬度：" + data[i].y + "</br></p>"); // 创建信息窗口对象
+		}
+            //标注地块注释信息
+			marker[0].addEventListener("mouseover", function () {
+                this.openInfoWindow(info[0]);
+            });
+			marker[1].addEventListener("mouseover", function () {
+                this.openInfoWindow(info[1]);
+            });
+			marker[2].addEventListener("mouseover", function () {
+                this.openInfoWindow(info[2]);
+            });
+			marker[3].addEventListener("mouseover", function () {
+                this.openInfoWindow(info[3]);
+            });
+			marker[4].addEventListener("mouseover", function () {
+                this.openInfoWindow(info[4]);
+            });
+			marker[5].addEventListener("mouseover", function () {
+                this.openInfoWindow(info[5]);
+            });			
+			marker[6].addEventListener("mouseover", function () {
+                this.openInfoWindow(info[6]);
+            });
+			marker[7].addEventListener("mouseover", function () {
+                this.openInfoWindow(info[7]);
+            });
+			marker[8].addEventListener("mouseover", function () {
+                this.openInfoWindow(info[8]);
+            });
+			marker[9].addEventListener("mouseover", function () {
+                this.openInfoWindow(info[9]);
+            });
+			marker[10].addEventListener("mouseover", function () {
+                this.openInfoWindow(info[10]);
+            });
+			marker[11].addEventListener("mouseover", function () {
+                this.openInfoWindow(info[11]);
+            });
+			marker[12].addEventListener("mouseover", function () {
+                this.openInfoWindow(info[12]);
+            });
+			marker[13].addEventListener("mouseover", function () {
+                this.openInfoWindow(info[13]);
+            });
+			marker[14].addEventListener("mouseover", function () {
+                this.openInfoWindow(info[14]);
+            });
+			marker[15].addEventListener("mouseover", function () {
+                this.openInfoWindow(info[15]);
+            });			
+			marker[16].addEventListener("mouseover", function () {
+                this.openInfoWindow(info[16]);
+            });
+			marker[17].addEventListener("mouseover", function () {
+                this.openInfoWindow(info[17]);
+            });
+			marker[18].addEventListener("mouseover", function () {
+                this.openInfoWindow(info[18]);
+            });
+			marker[19].addEventListener("mouseover", function () {
+                this.openInfoWindow(info[19]);
+            });
+
+			
+
+
+	});
+      return false;
+    });
+  });
+</script>
+</html>

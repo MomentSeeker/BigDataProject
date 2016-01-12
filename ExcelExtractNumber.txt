@@ -1,0 +1,9 @@
+Function zztq(rng As Range)
+Dim reg As Object
+Set reg = CreateObject("VBScript.RegExp")
+With reg
+.Global = True
+.Pattern = "\d{0,}\.?\d{0,}"
+zztq = .Execute(rng)(0)
+End With
+End Function

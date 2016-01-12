@@ -1,0 +1,119 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>柱状图</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="author" content="Cecilia Lee">
+<script src="../static/esl.js"></script>
+<script src="../static/jquery.min.js"></script>
+</head>
+<body>
+    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+    <div id="main" style="height:400px;width:740px"></div>
+</body>
+<script type="text/javascript">
+  // 路径配置
+  require.config({
+    paths:{ 
+      'echarts' : '../static/echarts',
+      'echarts/chart/line' : '../static/chart/line',
+      'echarts/chart/bar' : '../static/chart/bar'
+    }
+  });
+require(
+[
+  'echarts',
+  'echarts/chart/line',// 使用柱状图就加载bar模块，按需加载
+  'echarts/chart/bar'
+],
+    function (ec) {
+  // 基于准备好的dom，初始化echarts图表
+  myChart = ec.init(document.getElementById('main')); 
+  
+  var option = {
+    color: ['#ff7f50','#87cefa','#da70d6','#32cd32','#6495ed',
+            '#ff69b4','#ba55d3','#cd5c5c','#ffa500','#40e0d0',
+            '#1e90ff','#ff6347','#7b68ee','#00fa9a','#ffd700',
+            '#6699FF','#ff6666','#3cb371','#b8860b','#30e0e0'],
+     
+    title : {
+        text: '土地用地类型分析图',
+        
+    },
+    tooltip : {
+        trigger: 'axis'
+    },
+    toolbox: {
+        show : true,
+        feature : {
+            mark : {show: true},
+            dataView : {show: true, readOnly: false},
+            magicType: {show: true, type: ['line', 'bar']},
+            restore : {show: true},
+            saveAsImage : {show: true}
+        }
+    },
+    calculable : true,
+    legend: {
+        data:['起始价','成交价','数量']
+    },
+    xAxis : [
+        {
+            type : 'category',
+            data : ['商住','工业','住宅','其他']
+        },
+	{
+	    type : 'category',
+	    axisLine: {show:false},
+	    axisTick: {show:false},
+            axisLabel: {show:false},
+            splitArea: {show:false},
+            splitLine: {show:false},
+	    data : ['商住','工业','住宅','其他']
+	}
+    ],
+    yAxis : [
+        {
+            type : 'value',
+            name : '每平米均价（元）',
+            axisLabel : {
+                formatter: '{value} '
+            }
+        },
+        {
+            type : 'value',
+            name : '土地数量',
+            axisLabel : {
+                formatter: '{value} '
+            }
+        }
+    ],
+    series : [
+
+        {
+            name:'起始价',
+            type:'bar',
+	    itemStyle: {normal: {color:'rgba(232,124,37,1)', label:{show:false,textStyle:{color:'#ffd700'},position: 'insideTop'}}},
+            data:[16972.68, 359.69, 17496.54, 4851.7]
+        },
+        {
+            name:'成交价',
+            type:'bar',
+	    xAxisIndex:1,
+	    itemStyle: {normal: {color:'rgba(232,124,37,0.5)', label:{show:false,textStyle:{color:'#E87C25'}}}},
+            data:[24482.01, 359.69, 24724.08, 4851.8]
+        },
+        {
+            name:'数量',
+            type:'line',
+	        yAxisIndex:1,
+            itemStyle: {normal: {color:'#7b68ee', label:{show:true}}},
+	       data:[7, 5, 6, 2]
+        }
+    ]
+};
+
+  
+  // 为echarts对象加载数据 
+  myChart.setOption(option); 
+});
+</script>

@@ -1,0 +1,262 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>散点图</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="author" content="Cecilia Lee">
+<script src="../static/esl.js"></script>
+<script src="../static/jquery.min.js"></script>
+</head>
+<body>
+    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+    <div id="main" style="height:400px;width:800px"></div>
+</body>
+<script type="text/javascript">
+  // 路径配置
+  require.config({
+    paths:{ 
+      'echarts' : '../static/echarts',
+      'echarts/chart/line' : '../static/chart/line',
+      'echarts/chart/bar' : '../static/chart/bar',
+      'echarts/chart/scatter' : '../static/chart/scatter'
+    }
+  });
+require(
+[
+  'echarts',
+  'echarts/chart/line',// 使用柱状图就加载bar模块，按需加载
+  'echarts/chart/bar',
+  'echarts/chart/scatter'
+    
+],
+    function (ec) {
+  // 基于准备好的dom，初始化echarts图表
+  myChart = ec.init(document.getElementById('main')); 
+  
+  var option = {
+    title : {
+        text : '土地时间坐标散点图',
+    },
+    tooltip : {
+        trigger: 'axis',
+        axisPointer:{
+            show: true,
+            type : 'cross',
+            lineStyle: {
+                type : 'dashed',
+                width : 1
+            }
+        }
+    },
+    toolbox: {
+        show : true,
+        feature : {
+            mark : {show: true},
+            dataView : {show: true, readOnly: false},
+            restore : {show: true},
+            saveAsImage : {show: true}
+        }
+    },
+    dataZoom: {
+        show: true,
+        start : 30,
+        end : 70
+    },
+    legend : {
+        data : ['商住','工业','住宅','其他','商业']
+    },
+      //symbolList: ['circle'],
+    /*dataRange: {
+        min: 0,
+        max: 6000,
+        orient: 'horizontal',
+        y: 30,
+        x: 'center',
+        //text:['高','低'],           // 文本，默认为数值文本
+        color:['lightgreen','orange'],
+        //splitNumber: 5
+    },*/
+    grid: {
+        y2: 80
+    },
+    xAxis : [
+        {
+            type : 'time',
+            splitNumber:10
+        }
+    ],
+    yAxis : [
+        {
+            type : 'value',
+            name : '每平方米均价(元)',
+            axisLabel:{formatter:'{value} '}
+        }
+    ],
+    animation: false,
+    series : [
+        {
+            name:'商住',
+            type:'scatter',
+            tooltip : {
+                trigger: 'axis',
+                formatter : function (params) {
+                    var date = new Date(params.value[0]);
+                    return params.seriesName 
+                           + ' （'
+                           + date.getFullYear() + '-'
+                           + (date.getMonth() + 1) + '-'
+                           + date.getDate() + ' '
+                           + date.getHours() + ':'
+                           + date.getMinutes()
+                           +  '）<br/>'
+                           + params.value[1] + ', ' 
+                           + params.value[2];
+                },
+                axisPointer:{
+                    type : 'cross',
+                    lineStyle: {
+                        type : 'dashed',
+                        width : 1
+                    }
+                }
+            },
+            symbolSize: function (value){
+                	mysize = 15;
+                return mysize;
+            },
+            data: [[new Date(2015,11,10),2700.105517,53072],[new Date(2014,4, 30),673,3182],[new Date(2013,11,24),5600,41909],[new Date(2013,11,24),905,30623],[new Date(2013,11,24),1328,41625],[new Date(2013,8,19),331.8584071,5424],[new Date(2013,3,19),4050.668587,63866]]
+        },
+        {
+            name:'工业',
+            type:'scatter',
+            tooltip : {
+                trigger: 'axis',
+                formatter : function (params) {
+                    var date = new Date(params.value[0]);
+                    return params.seriesName 
+                           + ' （'
+                           + date.getFullYear() + '-'
+                           + (date.getMonth() + 1) + '-'
+                           + date.getDate() + ' '
+                           + date.getHours() + ':'
+                           + date.getMinutes()
+                           +  '）<br/>'
+                           + params.value[1] + ', ' 
+                           + params.value[2];
+                },
+                axisPointer:{
+                    type : 'cross',
+                    lineStyle: {
+                        type : 'dashed',
+                        width : 1
+                    }
+                }
+            },
+            symbolSize: function (value){
+                	mysize = 15;
+                return mysize;
+            },
+            data: [[new Date(2015, 3, 7),384 ,33290.44],[new Date(2015,3,6),200.4008016,998],[new Date(2013,11,23),280,38795],[new Date(2013,5,6),96,97078],[new Date(2012,6,20),264,21636],[new Date(2011,6,16),215.9140384,10051]]
+        },
+        {
+            name:'住宅',
+            type:'scatter',
+            tooltip : {
+                trigger: 'axis',
+                formatter : function (params) {
+                    var date = new Date(params.value[0]);
+                    return params.seriesName 
+                           + ' （'
+                           + date.getFullYear() + '-'
+                           + (date.getMonth() + 1) + '-'
+                           + date.getDate() + ' '
+                           + date.getHours() + ':'
+                           + date.getMinutes()
+                           +  '）<br/>'
+                           + params.value[1] + ', ' 
+                           + params.value[2];
+                },
+                axisPointer:{
+                    type : 'cross',
+                    lineStyle: {
+                        type : 'dashed',
+                        width : 1
+                    }
+                }
+            },
+            symbolSize: function (value){
+                	mysize = 15;
+                return mysize;
+            },
+            data: [[new Date(2015, 3, 7),1905.359747 ,54163],[new Date(2013,11,23),390.0000182,27397.65],[new Date(2012,8,17),2698.922583,6506.30]]
+        },
+        {
+            name:'其他',
+            type:'scatter',
+            tooltip : {
+                trigger: 'axis',
+                formatter : function (params) {
+                    var date = new Date(params.value[0]);
+                    return params.seriesName 
+                           + ' （'
+                           + date.getFullYear() + '-'
+                           + (date.getMonth() + 1) + '-'
+                           + date.getDate() + ' '
+                           + date.getHours() + ':'
+                           + date.getMinutes()
+                           +  '）<br/>'
+                           + params.value[1] + ', ' 
+                           + params.value[2];
+                },
+                axisPointer:{
+                    type : 'cross',
+                    lineStyle: {
+                        type : 'dashed',
+                        width : 1
+                    }
+                }
+            },
+            symbolSize: function (value){
+                	mysize = 15;
+                return mysize;
+            },
+            data: [[new Date(2015,11,9),238 ,86]]
+        },
+        {
+            name:'商业',
+            type:'scatter',
+            tooltip : {
+                trigger: 'axis',
+                formatter : function (params) {
+                    var date = new Date(params.value[0]);
+                    return params.seriesName 
+                           + ' （'
+                           + date.getFullYear() + '-'
+                           + (date.getMonth() + 1) + '-'
+                           + date.getDate() + ' '
+                           + date.getHours() + ':'
+                           + date.getMinutes()
+                           +  '）<br/>'
+                           + params.value[1] + ', ' 
+                           + params.value[2];
+                },
+                axisPointer:{
+                    type : 'cross',
+                    lineStyle: {
+                        type : 'dashed',
+                        width : 1
+                    }
+                }
+            },
+            symbolSize: function (value){
+                	mysize = 15;
+                return mysize;
+            },
+            data: [[new Date(2013, 11, 4),4500.216357 ,693.30],[new Date(2013, 11, 5),4510.010537 ,949],[new Date(2013, 2, 13),1373.626374 ,618.80]]
+        }
+    ]
+};
+  
+  // 为echarts对象加载数据 
+  myChart.setOption(option); 
+});
+</script>
