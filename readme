@@ -1,0 +1,29 @@
+1.代码文件说明
+1）数据爬取
+LandURL.py:爬取的是江苏省土地市场网结果公告网页( http://www.landjs.com/web/cjgs_list.aspx?xmlx=1&page=1)中的内容，获得每条公告的网络链接、土地位置坐标（用于最后的地图展示）、地块编号等信息，存储在LandBidPosition.xls文件中，每条公告的网络链接另外还存储在LandURL.txt中，方便LandAnnounceSpider.py的读取。
+LandAnnounceSpider.py：爬的是 LandURL.txt里面的网址，每条读入，然后将需要的内容存储在LandBid.xls中。
+URLTransfer.py：将招标地块的定位网址链接转换为其对应Json信息网址链接。
+LandXY.py：根据Json信息网址链接获取地块的经纬度信息。
+2）数据清洗
+ExcelExtractNumber.txt： 在Excel中提取某列中所有的数字，用于数据清洗中去除“竞价幅度”列的单位。
+CSV.py：提取原始Excel中每个地块的“id”、“x”和“y”，并去除了没有经纬度信息的地块，并将数据存储为csv格式。
+3）数据处理
+Query.py: 实现数据的接收、数据处理、数据发送等功能。
+4）数据展示
+static文件夹：
+map.js是主页面中提取目标地址的经纬度信息，并输出到页面的javascript程序。
+dataset_ready_xy.csv：是Query.py中使用的数据文件。
+其余的文件都是使用echart的包的配置文件。
+templates文件夹：
+map.html是主页面，信息输入查找部分、地图显示部分、土地成交价格柱状图、土地用地类型分析图和土地时间坐标散点图。
+line.html为使用echart绘制的土地用地类型分析图。
+scatter.html为使用echart绘制的土地时间坐标散点图。
+bar.html为使用echart绘制的土地成交价格柱状图。
+2.结果文件说明
+ LandResultURL.txt：每一行是一个结果公告的地址链接。
+LandBidPosition.xls：存储的是从江苏省土地市场网结果公告网页中获取的地块编号、地块地理位置坐标、地图网址等信息。
+LandBid.xls：存储的是从江苏省土地市场网结果公告网页中获取的信息。该xls文件中包含两个Sheet表格，其中SellSheet存放的是招标公告中获得的信息，ResultSheet存放的是结果公告的信息。
+MapJsonURL.txt：所有招标土地的Json信息网址链接。
+dataset_ready_xy.csv：只包含每个地块的“id”、“x”和“y”，并去除了没有经纬度信息的地块。
+landdata.sql：将所有数据存入MySQL数据库中，数据库的结构和数据信息。
+
