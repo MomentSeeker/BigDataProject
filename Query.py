@@ -3,6 +3,9 @@ import pandas as pd
 import numpy as np
 import MySQLdb
 import json
+import collections
+import datetime
+import time
 from sklearn.neighbors import NearestNeighbors
 from flask import Flask, jsonify, render_template, request
 
@@ -36,9 +39,9 @@ def QuryNearLand(QuryXY):
 #根据id查找数据库，获得该土地编号对应土地的交易信息
 def QuryMySQL(id):
     try:
-        conn = MySQLdb.connect(host='localhost',user='root',passwd='lyx1993426',port=3306,charset='utf8')
+        conn = MySQLdb.connect(host='localhost',user='root',passwd='lyx',port=3306,charset='utf8')
         cur = conn.cursor()
-        conn.select_db('landdata')
+        conn.select_db('Query')
         sql = "select * from resultsheet where id="+str(id)
         cur.execute(sql)
         results = cur.fetchall()
@@ -195,8 +198,66 @@ def CountSatistic(LandList):
     DealVarClass = Land('DealVar',DealVarList)
     DealVarJson = json.dumps(DealVarClass, ensure_ascii=False,encoding='utf-8',default=lambda obj: obj.__dict__)
     LandSatisticList = '['+AmountJson+','+BidMeanJson+','+BidMaxJson+','+BidMinJson+','+BidVarJson+','+DealMeanJson+','+DealMaxJson+','+DealMinJson+','+DealVarJson+']'
-    LandSatisticJson = json.loads(LandSatisticList)
-    return LandSatisticJson
+    #LandSatisticJson = json.loads(LandSatisticList)
+    return LandSatisticList
+
+def getScatterResult (LandJson):
+    CommerceList = []
+    IndustryList = []
+    ResidentList = []
+    OthersList = []
+    length = len(LandJson)
+    Json = json.loads(LandJson)
+    for OneLand in Json:
+        # str = '2012/11/19'
+        deal_time1_str = str(OneLand['deal_time1'])
+        size = float(OneLand['size'])
+        deal_price_average = float(OneLand['deal_price_average'])
+        # ［日期，每平方米价格，总面积］
+        land = [deal_time1_str, deal_price_average, size]
+        if OneLand['purpose'] == ur'商住':
+            CommerceList.append(land)
+        elif OneLand['purpose'] == ur'工业':
+            IndustryList.append(land)
+        elif OneLand['purpose'] == ur'住宅':
+            ResidentList.append(land)
+        else:
+            OthersList.append(land)
+        categary = collections.OrderedDict()
+        categary["commerce"] = CommerceList
+        categary["industry"] = IndustryList
+        categary["house"] = ResidentList
+        categary["others"] = OthersList
+        json_str = json.dumps(categary, ensure_ascii=False, encoding='utf-8')
+        #json_obj = json.loads(json_str)
+    return json_str
+
+def ColorList(LandInform):
+    # TargetColorList中的颜色配置分别为商住、工业、住宅、其他
+    TargetColorList = ['rgba(155,202,99,1)','rgba(155,202,99,0.5)','rgba(96,192,221,1)','rgba(96,192,221,0.5)','rgba(243,164,59,1)','rgba(243,164,59,0.5)','rgba(252,206,16,1)','rgba(252,206,16,0.5)']
+    BidPriceColorList = []
+    DealPriceColorList = []
+    LandJson = json.loads(LandInform)
+    for OneLand in LandJson:
+        if OneLand['purpose'] == ur'商住':
+            BidPriceColorList.append(TargetColorList[0])
+            DealPriceColorList.append(TargetColorList[1])
+        elif OneLand['purpose'] == ur'工业':
+            BidPriceColorList.append(TargetColorList[2])
+            DealPriceColorList.append(TargetColorList[3])
+        elif OneLand['purpose'] == ur'住宅':
+            BidPriceColorList.append(TargetColorList[4])
+            DealPriceColorList.append(TargetColorList[5])
+        else:
+            BidPriceColorList.append(TargetColorList[6])
+            DealPriceColorList.append(TargetColorList[7])
+    #print BidPriceColorList
+    BidPriceColor = Land('BidPriceColor',BidPriceColorList)
+    BidPriceColorJson = json.dumps(BidPriceColor ,default=lambda obj: obj.__dict__)
+    DealPriceColor = Land('DealPriceColor',DealPriceColorList)
+    DealPriceColorJson = json.dumps(DealPriceColor ,default=lambda obj: obj.__dict__)
+    ColorJson = '['+BidPriceColorJson+','+DealPriceColorJson+']'
+    return ColorJson
 
 #输入经纬度，返回20个地块的信息json和统计值json
 def QueryXYNearLand(PositionX,PositionY):
@@ -212,18 +273,30 @@ def QueryXYNearLand(PositionX,PositionY):
     #print NearLandDF
     dataJson = NearLandDF.to_json(orient = 'records')
     LandSatisticJson = CountSatistic(NearLandList)
-    return dataJson,LandSatisticJson
+    json_obj = json.loads(dataJson)
+    LandDataJson = json.dumps(json_obj,ensure_ascii=False)
+    #print type(LandDataJson)
+    ScatterResult = getScatterResult(LandDataJson)
+    ColorJson = ColorList(LandDataJson)
+    return dataJson,LandSatisticJson,ScatterResult,ColorJson
+#dataJson,LandSatisticJson,ScatterResult,BidPriceColorList,DealPriceColorList = QueryXYNearLand(118.804586,32.093429)
+#print ScatterResult
+#print BidPriceColorList,DealPriceColorList
 
-dataJson,LandSatisticJson = QueryXYNearLand(110,50)
-print dataJson
+#dataJson,LandSatisticJson = QueryXYNearLand(110,50)
+#Scatter,Bar= QueryPicture(110,50)
+#print dataJson
 #print LandSatisticJson
+#print Scatter
+#print Bar
 
 app = Flask(__name__)
 
 @app.route('/hello')
 def hello():
     return 'hello world!'
-#接收数据并传输数据
+
+#接收地图数据并传输数据
 @app.route('/_add_data')
 def add_data():
     a = request.args.get('a', 0, type=float)
@@ -232,23 +305,42 @@ def add_data():
     NearLand = QuryNearLand(A)
     return NearLand
 
+#接收土地用地类型分析图数据并传输数据
+@app.route('/_add_line')
+def add_line():
+    a = request.args.get('a', 0, type=float)
+    b = request.args.get('b', 0, type=float)
+    dataJson,LandSatisticJson,ScatterResult,ColorJson = QueryXYNearLand(a,b)
+    print LandSatisticJson
+    return LandSatisticJson
+
+@app.route('/_add_all')
+def add_all():
+    a = request.args.get('a', 0, type=float)
+    b = request.args.get('b', 0, type=float)
+    dataJson,LandSatisticJson,ScatterResult,ColorJson= QueryXYNearLand(a,b)
+    return dataJson
+
+@app.route('/_add_scatter')
+def add_scatter():
+    a = request.args.get('a', 0, type=float)
+    b = request.args.get('b', 0, type=float)
+    dataJson,LandSatisticJson,ScatterResult,ColorJson = QueryXYNearLand(a,b)
+    print ScatterResult
+    return ScatterResult
+
+@app.route('/_add_bar')
+def add_bar():
+    a = request.args.get('a', 0, type=float)
+    b = request.args.get('b', 0, type=float)
+    dataJson,LandSatisticJson,ScatterResult,ColorJson = QueryXYNearLand(a,b)
+    return ColorJson
+
 @app.route('/')
 #加载主页面
 def index():
     return render_template('map.html')
 
-@app.route('/bar')
-def bar():
-    return render_template('bar.html')
-
-@app.route('/line')
-def line():
-    return render_template('line.html')
-
-@app.route('/scatter')
-def scatter():
-    return render_template('scatter.html')
-
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0',port = 8080)    #host='0.0.0.0',port = 8080)
     app.debug = True
