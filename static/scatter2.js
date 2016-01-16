@@ -1,23 +1,11 @@
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-    <title>散点图</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <meta name="author" content="Cecilia Lee">
-<script src="../static/esl.js"></script>
-<script src="../static/jquery.min.js"></script>
-</head>
-<body>
-    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
-    <div id="main" style="height:400px;width:800px"></div>
-</body>
-<script type="text/javascript">
-  // 路径配置
-  require.config({
+//scattter
+// 路径配置
+require.config({
     paths:{ 
       'echarts' : '../static/echarts',
       'echarts/chart/line' : '../static/chart/line',
       'echarts/chart/bar' : '../static/chart/bar',
-      'echarts/chart/scatter' : '../static/chart/scatter'
+      'echarts/chart/scatter' : '../static/chart/scatter' 
     }
   });
 require(
@@ -27,10 +15,13 @@ require(
   'echarts/chart/bar',
   'echarts/chart/scatter'
     
-],
-    function (ec) {
-  // 基于准备好的dom，初始化echarts图表
-  myChart = ec.init(document.getElementById('main')); 
+], 
+    DrawEChart2
+);
+var myChart2;
+function DrawEChart2(ec) {
+    // 基于准备好的dom，初始化echarts图表
+  myChart2 = ec.init(document.getElementById('scatter2')); 
   
   var option = {
     title : {
@@ -62,19 +53,9 @@ require(
         end : 70
     },
     legend : {
-        data : ['商住','工业','住宅','其他','商业']
+        data : ['商住','工业','住宅','其他']
     },
       //symbolList: ['circle'],
-    /*dataRange: {
-        min: 0,
-        max: 6000,
-        orient: 'horizontal',
-        y: 30,
-        x: 'center',
-        //text:['高','低'],           // 文本，默认为数值文本
-        color:['lightgreen','orange'],
-        //splitNumber: 5
-    },*/
     grid: {
         y2: 80
     },
@@ -221,42 +202,38 @@ require(
             },
             data: [[new Date(2015,11,9),238 ,86]]
         },
-        {
-            name:'商业',
-            type:'scatter',
-            tooltip : {
-                trigger: 'axis',
-                formatter : function (params) {
-                    var date = new Date(params.value[0]);
-                    return params.seriesName 
-                           + ' （'
-                           + date.getFullYear() + '-'
-                           + (date.getMonth() + 1) + '-'
-                           + date.getDate() + ' '
-                           + date.getHours() + ':'
-                           + date.getMinutes()
-                           +  '）<br/>'
-                           + params.value[1] + ', ' 
-                           + params.value[2];
-                },
-                axisPointer:{
-                    type : 'cross',
-                    lineStyle: {
-                        type : 'dashed',
-                        width : 1
-                    }
-                }
-            },
-            symbolSize: function (value){
-                	mysize = 15;
-                return mysize;
-            },
-            data: [[new Date(2013, 11, 4),4500.216357 ,693.30],[new Date(2013, 11, 5),4510.010537 ,949],[new Date(2013, 2, 13),1373.626374 ,618.80]]
-        }
     ]
 };
-  
   // 为echarts对象加载数据 
-  myChart.setOption(option); 
+  //myChart2.setOption(option); 
+     $(function() {
+    $('a#touch').bind('click', function() {
+      $.getJSON($SCRIPT_ROOT + '/_add_scatter', {
+        a: $('#result1').val(),
+        b: $('#result2').val(),
+        now: new Date().getTime()
+      }, function(data) {
+          $('#result').text(data.length);
+        if(data){
+            for (var i =0;i<data.commerce.length;i++){
+            option.series[0].data[i] = [new Date(data.commerce[i][0]),data.commerce[i][1],data.commerce[i][2]];
+          }
+        for (var i =0;i<data.industry.length;i++){
+            option.series[1].data[i] = [new Date(data.industry[i][0]),data.industry[i][1],data.industry[i][2]];
+          }
+        for (var i =0;i<data.house.length;i++){
+            option.series[2].data[i] = [new Date(data.house[i][0]),data.house[i][1],data.house[i][2]];
+          }
+        for (var i =0;i<data.others.length;i++){
+            option.series[3].data[i] = [new Date(data.others[i][0]),data.others[i][1],data.others[i][2]];
+          }
+        
+        myChart2.setOption(option);
+              }
+              
+          
+      });
+      return false;
+    });
 });
-</script>
+}
